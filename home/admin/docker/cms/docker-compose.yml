@@ -13,7 +13,6 @@ services:
     volumes:
       - wordpress-storage:/var/www/html
       - ./nginx/app.conf:/etc/nginx/conf.d/default.conf:ro
-      # - ./wordpress/wp-content:/var/www/html/wp-content
 
   cms-wordpress:
     build:
@@ -42,7 +41,6 @@ services:
         # define('WPMS_SMTP_PASS', '${WPMS_SMTP_PASS}');
     volumes:
       - wordpress-storage:/var/www/html
-      # - ./wordpress/wp-content:/var/www/html/wp-content
 
   cms-wp-cli:
     image : wordpress:cli-2.6.0-php8.1
@@ -59,7 +57,6 @@ services:
     depends_on:
       - cms-mariadb
       - cms-wordpress
-    # entrypoint: wp
     volumes:
       - wordpress-storage:/var/www/html
 
@@ -97,7 +94,7 @@ services:
 
   cms-backup-cron:
     build:
-      context: /home/nrouyer/workspace/floresentinelle-srv/home/admin/docker/cms/backup/crontab/build/
+      context: cronBackup/build
       dockerfile: Dockerfile
     container_name: cms-backup-cron
     restart: unless-stopped
