@@ -1,0 +1,124 @@
+version: "3.9"
+
+services:
+  cms-nginx:
+    image: nginx:1.22.0
+    # https://hub.docker.com/_/nginx
+    container_name: cms-nginx
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:50080:80"
+    depends_on:
+      - cms-wordpress
+    volumes:
+      - wordpress-storage:/var/www/html
+      - ./nginx/app.conf:/etc/nginx/conf.d/default.conf:ro
+      # - ./wordpress/wp-content:/var/www/html/wp-content
+
+  cms-wordpress:
+    build:
+      context: ./wordpress/build
+      dockerfile: Dockerfile
+    image: wordpress:6.0.0-php8.1-fpm
+    # https://hub.docker.com/_/wordpress
+    container_name: cms-wordpress
+    restart: unless-stopped
+    env_file: .env
+    expose:
+      - 9000
+    depends_on:
+      - cms-mariadb
+    environment:
+      WORDPRESS_DB_HOST: cms-mariadb:3306
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DB_NAME: ${MYSQL_DB}
+      WORDPRESS_TABLE_PREFIX: floresent_
+      # WORDPRESS_DEBUG : use an empty string to disable
+      WORDPRESS_DEBUG: ""
+      # WORDPRESS_CONFIG_EXTRA: |
+        # //define('FORCE_SSL_ADMIN', true);
+        # define('WPMS_ON', true);
+        # define('WPMS_SMTP_PASS', '${WPMS_SMTP_PASS}');
+    volumes:
+      - wordpress-storage:/var/www/html
+      # - ./wordpress/wp-content:/var/www/html/wp-content
+
+  cms-wp-cli:
+    image : wordpress:cli-2.6.0-php8.1
+    # https://hub.docker.com/_/wordpress
+    container_name: cms-wp-cli
+    restart: "no"
+    env_file: .env
+    environment:
+      WORDPRESS_DB_HOST: cms-mariadb:3306
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DB_NAME: ${MYSQL_DB}
+      WORDPRESS_TABLE_PREFIX: floresent_
+    depends_on:
+      - cms-mariadb
+      - cms-wordpress
+    # entrypoint: wp
+    volumes:
+      - wordpress-storage:/var/www/html
+
+  cms-mariadb:
+    image: mariadb:10.7.4-focal
+    # https://hub.docker.com/_/mariadb
+    container_name: cms-mariadb
+    restart: unless-stopped
+    env_file: .env
+    expose:
+      - 3306
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DB}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        # See : https://github.com/docker-library/mariadb/issues/160
+      MYSQL_INITDB_SKIP_TZINFO: "yes"
+    volumes:
+      - db-storage:/var/lib/mysql
+      - ./database/initdb.d/:/docker-entrypoint-initdb.d/
+
+  cms-adminer:
+    image: adminer:4.8.1-standalone
+    # https://hub.docker.com/_/adminer
+    container_name: cms-adminer
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:50081:8080"
+    depends_on:
+      - cms-mariadb
+    environment:
+      ADMINER_DESIGN: lucas-sandery
+      ADMINER_DEFAULT_SERVER: cms-mariadb
+
+  cms-backup-cron:
+    build:
+      context: /home/nrouyer/workspace/floresentinelle-srv/home/admin/docker/cms/backup/crontab/build/
+      dockerfile: Dockerfile
+    container_name: cms-backup-cron
+    restart: unless-stopped
+    depends_on:
+      - cms-mariadb
+    env_file: .env
+    environment:
+      WORDPRESS_DB_HOST: cms-mariadb:3306
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DB_NAME: ${MYSQL_DB}
+      WORDPRESS_TABLE_PREFIX: floresent_
+    volumes:
+        - wordpress-storage:/var/www/html
+        - ./dump/backup:/backup/
+        
+volumes:
+  db-storage:
+  wordpress-storage:
+
+networks:
+  default:
+    external:
+      name: nginx-proxy

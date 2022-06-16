@@ -1,0 +1,8 @@
+DATEVAR="date +%Y%m%d"
+
+# If you want check ip of mariadb container use cmd : docker network inspect nginx-proxy 
+* * * * * mysqldump -P 3306 -h 172.18.5.2 -u $MYSQL_USER -p$MYSQL_PASSWORD -B $MYSQL_DB > "/var/www/html/backup/wordpress_dump_$($DATEVAR).sql"
+* * * * * tar -zcvf "/var/www/html/backup/wp-content_backup_$($DATEVAR).tar.gz" /var/www/html/wp-content
+* * * * * find /var/www/html/backup/* -mtime +1 -exec rm {} \;
+
+# An empty line is required at the end of this file for a valid cron file.
