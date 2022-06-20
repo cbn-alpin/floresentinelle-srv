@@ -16,7 +16,7 @@ RUN apt-get install -y wget apt-transport-https \
 RUN rm -rf /var/lib/apt/lists/*
 
 # Copy and active cron
-COPY cronBackup/backup.cron /etc/cron.d/backup
+COPY ./backup.cron /etc/cron.d/backup
 RUN chmod 0644 /etc/cron.d/backup \
     && chown root: /etc/cron.d/backup \
     && chmod u+s /usr/sbin/cron \
@@ -24,6 +24,6 @@ RUN chmod 0644 /etc/cron.d/backup \
 	&& touch /var/log/cron.log
 
 # Use new entry point wrapper
-COPY cronBackup/backup-entrypoint.sh /backup-entrypoint.sh
+COPY ./backup-entrypoint.sh /backup-entrypoint.sh
 RUN chmod 755 /backup-entrypoint.sh
 ENTRYPOINT ["/backup-entrypoint.sh"]

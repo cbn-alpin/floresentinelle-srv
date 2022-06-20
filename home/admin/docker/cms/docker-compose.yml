@@ -94,8 +94,8 @@ services:
 
   cms-backup-cron:
     build:
-      context: cronBackup/build
-      dockerfile: Dockerfile
+      context: cronBackup
+      dockerfile: build/Dockerfile
     container_name: cms-backup-cron
     restart: unless-stopped
     depends_on:
@@ -109,7 +109,7 @@ services:
       WORDPRESS_TABLE_PREFIX: floresent_
     volumes:
         - wordpress-storage:/var/www/html
-        - ./dump/backup:/backup/
+        - ./backup:/var/www/html/backup
         
 volumes:
   db-storage:
