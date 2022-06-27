@@ -3,7 +3,7 @@ FROM debian:bullseye-slim
 # Install cron
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        apt-utils cron
+        apt-utils cron vim
     
 # Install mariadb-client   
 RUN apt-get install -y wget apt-transport-https \
@@ -15,12 +15,15 @@ RUN apt-get install -y wget apt-transport-https \
 # Remove package lists for smaller image sizes
 RUN rm -rf /var/lib/apt/lists/*
 
+# Copy script for cron
+COPY ./backup.sh /usr/local/backup.sh
+RUN chmod 755 /usr/local/backup.sh
+
 # Copy and active cron
 COPY ./backup.cron /etc/cron.d/backup
 RUN chmod 0644 /etc/cron.d/backup \
     && chown root: /etc/cron.d/backup \
     && chmod u+s /usr/sbin/cron \
-    && crontab /etc/cron.d/backup \
 	&& touch /var/log/cron.log
 
 # Use new entry point wrapper

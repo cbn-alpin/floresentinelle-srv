@@ -3,3 +3,6 @@
 # Except this file
 !.gitignore
 !Dockerfile
+!backup-entrypoint.sh
+!backup.cron
+!backup.sh

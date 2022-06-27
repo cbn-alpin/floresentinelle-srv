@@ -94,8 +94,8 @@ services:
 
   cms-backup-cron:
     build:
-      context: cronBackup
-      dockerfile: build/Dockerfile
+      context: ./cron/build
+      dockerfile: Dockerfile
     container_name: cms-backup-cron
     restart: unless-stopped
     depends_on:
@@ -110,7 +110,7 @@ services:
     volumes:
         - wordpress-storage:/var/www/html
         - ./backup:/var/www/html/backup
-        
+
 volumes:
   db-storage:
   wordpress-storage:
