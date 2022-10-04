@@ -1,0 +1,10 @@
+#app-toolbar {
+ 	background-color: #444;
+	color: #fff;
+}
+#app-toolbar .mat-icon-button, #app-toolbar button {
+	color: rgba(0, 0, 0, .87);
+}
+#app-sidenav .module-name {
+	font-size: .9rem;
+}

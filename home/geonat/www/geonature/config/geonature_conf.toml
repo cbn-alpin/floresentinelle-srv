@@ -1,0 +1,129 @@
+#############################################
+# GeoNature backend global configuration file
+#############################################
+
+# Nom de l'application dans la page d'accueil.
+appName = "Flore Sentinelle"
+
+# Database
+SQLALCHEMY_DATABASE_URI = "postgresql://<user>:<password>@localhost:5432/geonature2db"
+URL_APPLICATION = "https://geonature.floresentinelle.fr"
+API_ENDPOINT = "https://geonature.floresentinelle.fr/api"
+API_TAXHUB = "https://taxhub.floresentinelle.fr/api"
+
+# Méthode d'encodage du mot de passe nécessaire à l'identification (hash ou md5)
+PASS_METHOD = "md5"
+
+# Remplacer par une clé alétoire complexe
+SECRET_KEY = "<secret-key>"
+
+# Code EPSG des geométries dans la BDD
+LOCAL_SRID = "2154"
+
+# Langue principale par défaut
+DEFAULT_LANGUAGE = "fr"
+
+# Enable logging email error (must fill the mail config section bellow if true)
+MAIL_ON_ERROR = true
+
+
+#######################################################################################
+###### Si vous souhaitez surcoucher certains paramètres,
+###### compléter les sections ci-dessous à partir du modèle default_config.toml.example
+#######################################################################################
+
+[ALEMBIC]
+VERSION_LOCATIONS = "/home/geonat/www/usershub/app/migrations/versions"
+
+# Configuration de l'envoie d'emails
+[MAIL_CONFIG]
+    MAIL_SERVER = "localhost"
+    MAIL_PORT = 25
+    MAIL_USE_TLS = false
+    MAIL_USE_SSL = false
+    MAIL_USERNAME = ""
+    MAIL_PASSWORD = ""
+    MAIL_DEFAULT_SENDER = "Ne Pas Répondre <mailer@floresentinelle.fr>"
+    MAIL_ASCII_ATTACHMENTS = false
+    # email(s) to the administrator for the email logging
+    ERROR_MAIL_TO = ["adminsys@floresentinelle.fr"]
+
+# Configuration de l'accès distant à UsersHub (API)
+[USERSHUB]
+    URL_USERSHUB = "https://usershub.floresentinelle.fr" # sans slash final
+    # Administrateur de mon application
+    ADMIN_APPLICATION_LOGIN = "<login>"
+    ADMIN_APPLICATION_PASSWORD = "<password>"
+
+# Gestion des demandes d'inscription
+[ACCOUNT_MANAGEMENT]
+    ENABLE_SIGN_UP = true
+    AUTO_ACCOUNT_CREATION = false
+    VALIDATOR_EMAIL = "webmaster@floresentinelle.fr"
+    AUTO_DATASET_CREATION = false
+    ENABLE_USER_MANAGEMENT = true
+
+# Configuration générale du frontend
+[FRONTEND]
+    # Affiche la carte des 100 obs sur la page d'accueil
+    DISPLAY_MAP_LAST_OBS = true
+
+    # Durée de vie du cache des stats de la page d'accueil
+    # 864 000 = 10 jours
+    STAT_BLOC_TTL = 864000
+
+    # Affiche le composant 'custom/components/footer' sur la page d'accueil
+    DISPLAY_FOOTER = false
+
+    # Activer l'affichage des informations liées aux profils de taxons
+    ENABLE_PROFILES = true
+
+# Configuration cartographique
+[MAPCONFIG]
+    BASEMAP = [
+        {"name" = "OpenStreetMap", "layer" = "//{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", "attribution" = "&copy OpenStreetMap"},
+        {"name" = "OpenTopoMap", "layer" = "//a.tile.opentopomap.org/{z}/{x}/{y}.png", "attribution" = "© OpenTopoMap"},
+        {"name" = "GoogleSatellite", "layer" = "//{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", "subdomains" = ["mt0", "mt1", "mt2", "mt3"], "attribution" = "© GoogleMap"}
+    ]
+    # Attention : les coordonnées sont au format [Y, X]
+    # Cf leaflet configuration (https://leafletjs.com/reference-1.4.0.html#latlng-l-latlng)
+    CENTER = [44.63891, 6.11608]
+    # Zoom par défaut
+    ZOOM_LEVEL = 12
+    # Zoom à partir duquel on peut pointer un relevé
+    ZOOM_LEVEL_RELEVE = 15
+    # Zoom appliqué sur la carte lorsque l'on clique sur une liste
+    ZOOM_ON_CLICK = 16
+
+# CRITICAL: 50 ; ERROR: 40 ; WARNING: 30 ; INFO: 20 ; DEBUG: 10 ; NOTSET: 0
+[SERVER]
+    LOG_LEVEL = 20
+
+# Configuration de la Synthese
+[SYNTHESE]
+    # Liste des entités géographiques sur lesquelles les filtres géographiques de la synthese s'appuient
+    # (id_area = id de l'entité géo, table ref_geo.bib_areas_types).
+    AREA_FILTERS = [
+        { label = "Communes", type_code = "COM" },
+        { label = "Départements", type_code = "DEP" },
+    ]
+    # Nombre d'observation maximum à afficher sur la carte après une recherche
+    NB_MAX_OBS_MAP = 100000
+    # Nombre des dernières observations affichées par défaut quand on arrive sur la synthese
+    NB_LAST_OBS = 0
+    # Colonne à afficher par défaut sur la liste des résultats de la synthese
+    # Choisir le champ 'prop' parmis les colonnes suivante
+    # (id_synthese, date_min, cd_nom, lb_nom, nom_vern_or_lb_nom, st_asgeojson, observers, dataset_name, url_source)
+    LIST_COLUMNS_FRONTEND = [
+        { prop = "lb_nom", name = "Taxon" },
+        { prop = "date_min", name = "Date début" },
+        { prop = "observers", name = "Observateurs" },
+        { prop = "dataset_name", name = "Jeu de données" }
+    ]
+    # Affiche (=true) ou masque (=false) l'arbre de recherche taxonomique
+    # dans la recherche taxonomique avancée.
+    DISPLAY_TAXON_TREE = false
+
+    # Nombre max d'observation dans les exports
+    # WARNING : Au 2020-11-12, un bug empêche d'avoir une valeur différente pour les export.
+    NB_MAX_OBS_EXPORT = 100000
