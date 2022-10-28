@@ -1,38 +1,41 @@
-FROM debian:10.9-slim AS builder
+FROM debian:11.5-slim AS builder
 # Builder to avoid to embed develop files
 
 LABEL mainainer="Jean-Pascal MILCENT"
 LABEL source="https://github.com/b3vis/docker-borgmatic"
 
 # Borg releases: https://www.borgbackup.org/releases/
-ARG BORG_VERSION=1.1.16
+ARG BORG_VERSION=1.2.2
 # Borgmatic releases: see https://github.com/witten/borgmatic
-ARG BORGMATIC_VERSION=1.5.12
+ARG BORGMATIC_VERSION=1.7.4
 # LlFuse releases: https://pypi.org/project/llfuse/
-ARG LLFUSE_VERSION=1.4.1
+ARG PYFUSE_VERSION=3.2.2
 
 # Install dev packages
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
 		apt-utils \
-    	python3 python3-dev python3-pip python-virtualenv \
-     	libssl-dev openssl \
+    	python3 python3-dev python3-pip python3-virtualenv \
 		libacl1-dev libacl1 \
-		build-essential \
-		libfuse-dev fuse pkg-config \
+        libssl-dev \
+        liblz4-dev libzstd-dev libxxhash-dev \
+        build-essential \
+        pkg-config python3-pkgconfig \
+        libfuse3-dev fuse3 \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& python3 -m pip install --upgrade pip \
 	&& python3 -m pip install -U pip setuptools wheel \
     && python3 -m pip install --upgrade borgbackup==${BORG_VERSION} \
     && python3 -m pip install --upgrade borgmatic==${BORGMATIC_VERSION} \
-    && python3 -m pip install --upgrade llfuse==${LLFUSE_VERSION} \
+    && python3 -m pip install --upgrade pyfuse3==${PYFUSE_VERSION} \
 	&& python3 -m pip install --upgrade ntfy[pid,emoji,xmpp,telegram,instapush,slack,rocketchat]
 
 
-FROM debian:10.9-slim
+FROM debian:11.5-slim
 LABEL mainainer="Jean-Pascal MILCENT"
 
 ARG MAILTO
+ARG PGSQL_MAJOR_VERSION
 
 ENV LANG fr_FR.UTF-8
 ENV LANGUAGE fr_FR:fr
@@ -42,24 +45,23 @@ ENV LC_ALL fr_FR.UTF-8
 # WARNING: use same postgresql-client package that the host server !
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
-		apt-utils locales less curl wget vim sudo cron iputils-ping gnupg \
+        apt-utils locales less curl wget vim sudo cron iputils-ping gnupg lsb-release \
 		msmtp msmtp-mta bsd-mailx mailutils \
     	tzdata \
 		sshfs \
 		python3 \
 		openssl \
 		ca-certificates \
-		fuse \
+		fuse3 \
 		lz4 \
 		libacl1 \
-		#mariadb-client \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Add postresql deb package repo
-RUN echo deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main >> /etc/apt/sources.list.d/pgdg.list \
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
 	&& wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - \
 	&& apt-get update \
-	&& apt-get install -y --no-install-recommends postgresql-client-12 \
+    && apt-get install -y --no-install-recommends "postgresql-client-${PGSQL_MAJOR_VERSION}" \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Set the locale
@@ -99,7 +101,7 @@ COPY ./telegram-send.sh /usr/local/bin/telegram-send
 
 # Copy file from "builder" image
 #COPY --from=builder /usr/lib/python3/dist-packages /usr/lib/python3/
-COPY --from=builder /usr/local/lib/python3.7/dist-packages /usr/local/lib/python3.7/dist-packages
+COPY --from=builder /usr/local/lib/python3.9/dist-packages /usr/local/lib/python3.9/dist-packages
 COPY --from=builder /usr/local/bin/borg /usr/local/bin/
 COPY --from=builder /usr/local/bin/borgfs /usr/local/bin/
 COPY --from=builder /usr/local/bin/borgmatic /usr/local/bin/
