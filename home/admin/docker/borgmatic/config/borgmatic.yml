@@ -1,0 +1,67 @@
+# Set your configuration in borgmatic.yml : cp borgmatic.sample.conf borgmatic.yml
+# Do not forget to set secure permissions on this file as well as on any script listed in hooks section:
+# chmod 0700 borgmatic.yml
+# Where to look for files to backup, and where to store those backups. See
+# https://borgbackup.readthedocs.io/en/stable/quickstart.html and
+# https://borgbackup.readthedocs.io/en/stable/usage.html#borg-create for details.
+location:
+  source_directories:
+    - /mnt/source/etc
+    - /mnt/source/home
+    - /mnt/source/opt
+    - /mnt/source/root
+    - /mnt/source/usr/local
+  one_file_system: true
+  files_cache: ctime,size,inode
+  read_special: true
+  repositories:
+    - /mnt/borg-repository
+    - ssh://backups@10.0.1.10:<ssh-port>/home/backups/floresentinelle-srv/
+  exclude_patterns:
+    - /mnt/source/home/admin/docker/borgmatic/data/
+    # Do not exclude this path  "- /mnt/source/root/.borgmatic/" with database backup.
+    - /mnt/source/root/.config/borg
+    - /mnt/source/root/.config/borgmatic
+    - /mnt/source/*/.cache/
+  exclude_caches: true
+  exclude_if_present: .nobackup
+
+storage:
+    lock_wait: 5
+    temporary_directory: /tmp
+    compression: zstd,15
+    archive_name_format: 'floresentinelle-srv-{now}'
+
+retention:
+    keep_hourly: 0
+    keep_daily: 7
+    keep_weekly: 4
+    keep_monthly: 6
+    keep_yearly: 3
+    prefix: 'floresentinelle-srv-'
+
+consistency:
+    checks:
+        - repository
+        - archives
+    check_last: 3
+    prefix: 'floresentinelle-srv-'
+
+hooks:
+    postgresql_databases:
+       - name: geonature2db
+         hostname: 172.18.5.1
+         port: 5432
+         username: geonatadmin
+         password: <geonatadmin-password>
+         # WARNING : the "directory" format doesn't work ! Use the "custom" format instead.
+         format: custom
+         # WARNING : the below option does'nt work with "directory" format.
+         #options: "--compress 9 --jobs=2"
+    before_backup:
+        - ping -q -c 1 10.0.1.10 > /dev/null || exit 75
+        - "/usr/local/bin/telegram-send \"Borgmatic ${HOSTNAME}: starting a backup job at `date` !\""
+    after_backup:
+        - "/usr/local/bin/telegram-send \"Borgmatic ${HOSTNAME}: backup created at `date` !\""
+    on_error:
+        - "/usr/local/bin/telegram-send \"Borgmatic ${HOSTNAME}: ERROR while creating a backup at `date` !\""

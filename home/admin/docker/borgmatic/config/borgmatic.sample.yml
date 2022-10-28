@@ -29,7 +29,6 @@ location:
   # See the output of "borg help patterns" for more details.
   exclude_patterns:
     - /mnt/source/home/admin/docker/borgmatic/data/
-    - /mnt/source/root/.borgmatic/
     - /mnt/source/root/.config/borg
     - /mnt/source/root/.config/borgmatic
     - /mnt/source/*/.cache/
@@ -127,10 +126,11 @@ hooks:
         # Database dump output format. One of "plain", "custom", "directory", or "tar".
         # Defaults to "custom" (unlike raw pg_dump). See pg_dump documentation for details.
         # Note that format is ignored when the database name is "all".
-        format: directory
+        # WARNING : the "directory" format doesn't work.
+        format: custom
         # Additional pg_dump/pg_dumpall options to pass directly to the dump command, without performing
         # any validation on them. See pg_dump documentation for details.
-        options: "--compress 9 --jobs=4"
+        #options: "--compress 9 --jobs=4"
       - name: gnatlas
         hostname: 172.18.0.1
         port: 5432
