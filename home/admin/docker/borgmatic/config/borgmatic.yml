@@ -58,10 +58,11 @@ hooks:
          format: custom
          # WARNING : the below option does'nt work with "directory" format.
          #options: "--compress 9 --jobs=2"
+    before_everything:
+        - "/usr/local/bin/telegram-send \"Borgmatic ${HOSTNAME}: starting a backup job at `date` !\""
     before_backup:
         - ping -q -c 1 10.0.1.10 > /dev/null || exit 75
-        - "/usr/local/bin/telegram-send \"Borgmatic ${HOSTNAME}: starting a backup job at `date` !\""
-    after_backup:
+    after_everything:
         - "/usr/local/bin/telegram-send \"Borgmatic ${HOSTNAME}: backup created at `date` !\""
     on_error:
         - "/usr/local/bin/telegram-send \"Borgmatic ${HOSTNAME}: ERROR while creating a backup at `date` !\""

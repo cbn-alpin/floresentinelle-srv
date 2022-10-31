@@ -138,16 +138,17 @@ hooks:
         password: <db-user-pwd>
         format: tar
     # List of one or more shell commands or scripts to execute before creating a backup.
-    before_backup:
-        # Ping the distant backup repo to check availability
-        - ping -q -c 1 <bkp-server-private-ip> > /dev/null || exit 75
+    before_everything:
         # Use of Ntfy with Telegram example.
         # WARNING: you must configure manually your bot after each container buil/start with:
         # ntfy -b telegram send "Borgmatic ${HOSTNAME}: test at `date` !"
         #- "/usr/local/bin/ntfy -b telegram send \"Borgmatic ${HOSTNAME}: starting a backup job at `date` !\""
         - "/usr/local/bin/telegram-send \"Borgmatic ${HOSTNAME}: starting a backup job at `date` !\""
+    before_backup:
+        # Ping the distant backup repo to check availability
+        - ping -q -c 1 <bkp-server-private-ip> > /dev/null || exit 75
     # List of one or more shell commands or scripts to execute after creating a backup.
-    after_backup:
+    after_everything:
         # Use of Ntfy with Telegram example.
         #- "/usr/local/bin/ntfy -b telegram send \"Borgmatic ${HOSTNAME}: backup created at `date` !\""
         - "/usr/local/bin/telegram-send \"Borgmatic ${HOSTNAME}: backup created at `date` !\""
