@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   cms-nginx:
-    image: nginx:1.22.0
+    image: nginx:1.24.0-bullseye
     # https://hub.docker.com/_/nginx
     container_name: cms-nginx
     restart: unless-stopped
@@ -18,7 +18,7 @@ services:
     build:
       context: ./wordpress/build
       dockerfile: Dockerfile
-    image: wordpress:6.0.0-php8.1-fpm
+    image: wordpress:6.2.2-php8.2-fpm
     # https://hub.docker.com/_/wordpress
     container_name: cms-wordpress
     restart: unless-stopped
@@ -43,10 +43,11 @@ services:
       - wordpress-storage:/var/www/html
 
   cms-wp-cli:
-    image : wordpress:cli-2.6.0-php8.1
+    image : wordpress:cli-2.7.1-php8.1
     # https://hub.docker.com/_/wordpress
     container_name: cms-wp-cli
     restart: "no"
+    profiles: ["cli"]
     env_file: .env
     environment:
       WORDPRESS_DB_HOST: cms-mariadb:3306
@@ -61,7 +62,7 @@ services:
       - wordpress-storage:/var/www/html
 
   cms-mariadb:
-    image: mariadb:10.7.4-focal
+    image: mariadb:10.11.3-jammy
     # https://hub.docker.com/_/mariadb
     container_name: cms-mariadb
     restart: unless-stopped
@@ -77,7 +78,8 @@ services:
       MYSQL_INITDB_SKIP_TZINFO: "yes"
     volumes:
       - db-storage:/var/lib/mysql
-      - ./database/initdb.d/:/docker-entrypoint-initdb.d/
+      # Initialise Database with SQL files store in ./database/initdb.d/:
+      #- ./database/initdb.d/:/docker-entrypoint-initdb.d/
 
   cms-adminer:
     image: adminer:4.8.1-standalone
@@ -96,6 +98,8 @@ services:
     build:
       context: ./cron/build
       dockerfile: Dockerfile
+    image: cbn-alpin:cron-1.0.0-debian-11.7-slim
+    # https://hub.docker.com/_/debian
     container_name: cms-backup-cron
     restart: unless-stopped
     depends_on:
@@ -110,12 +114,12 @@ services:
     volumes:
         - wordpress-storage:/var/www/html
         - ./backup:/var/www/html/backup
-
+        
 volumes:
   db-storage:
   wordpress-storage:
 
 networks:
   default:
-    external:
-      name: nginx-proxy
+    name: nginx-proxy
+    external: true

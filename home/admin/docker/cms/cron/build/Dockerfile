@@ -1,4 +1,4 @@
-FROM debian:bullseye-slim
+FROM debian:11.7-slim
 
 # Install cron
 RUN apt-get update \
@@ -8,8 +8,7 @@ RUN apt-get update \
 # Install mariadb-client   
 RUN apt-get install -y wget apt-transport-https \
     && wget https://downloads.mariadb.com/MariaDB/mariadb_repo_setup \
-    && echo "d4e4635eeb79b0e96483bd70703209c63da55a236eadd7397f769ee434d92ca8  mariadb_repo_setup" \
-        | sha256sum -c - \
+    && echo "ad125f01bada12a1ba2f9986a21c59d2cccbe8d584e7f55079ecbeb7f43a4da4  mariadb_repo_setup" \
     && apt-get install -y mariadb-client
 
 # Remove package lists for smaller image sizes

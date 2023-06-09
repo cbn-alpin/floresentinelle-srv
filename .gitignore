@@ -1,0 +1,12 @@
+*.conf
+!**/postgresql/**/*.conf
+!**/nginx/*.conf
+!*.sample.conf
+!*.default.conf
+.env*
+msmtp.env
+!.env.sample
+*.mmdb
+*.pem
+ntfy.yml
+aliases.txt

@@ -1,15 +1,15 @@
-FROM debian:11.5-slim AS builder
+FROM debian:11.7-slim AS builder
 # Builder to avoid to embed develop files
 
 LABEL mainainer="Jean-Pascal MILCENT"
 LABEL source="https://github.com/b3vis/docker-borgmatic"
 
 # Borg releases: https://www.borgbackup.org/releases/
-ARG BORG_VERSION=1.2.2
+ARG BORG_VERSION=1.2.4
 # Borgmatic releases: see https://github.com/witten/borgmatic
-ARG BORGMATIC_VERSION=1.7.4
-# LlFuse releases: https://pypi.org/project/llfuse/
-ARG PYFUSE_VERSION=3.2.2
+ARG BORGMATIC_VERSION=1.7.14
+# PyFuse releases: https://pypi.org/project/pyfuse3/#history
+ARG PYFUSE_VERSION=3.2.3
 
 # Install dev packages
 RUN apt-get update \
@@ -31,7 +31,7 @@ RUN apt-get update \
 	&& python3 -m pip install --upgrade ntfy[pid,emoji,xmpp,telegram,instapush,slack,rocketchat]
 
 
-FROM debian:11.5-slim
+FROM debian:11.7-slim
 LABEL mainainer="Jean-Pascal MILCENT"
 
 ARG MAILTO
@@ -40,29 +40,32 @@ ARG PGSQL_MAJOR_VERSION
 ENV LANG fr_FR.UTF-8
 ENV LANGUAGE fr_FR:fr
 ENV LC_ALL fr_FR.UTF-8
+ENV TZ="Europe/Paris"
 
 # Install utils and sendmail
 # WARNING: use same postgresql-client package that the host server !
 RUN apt-get update \
-	&& apt-get install -y --no-install-recommends \
-        apt-utils locales less curl wget vim sudo cron iputils-ping gnupg lsb-release \
-		msmtp msmtp-mta bsd-mailx mailutils \
-    	tzdata \
-		sshfs \
-		python3 \
-		openssl \
-		ca-certificates \
-		fuse3 \
-		lz4 \
-		libacl1 \
-	&& rm -rf /var/lib/apt/lists/*
-
-# Add postresql deb package repo
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
-	&& wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - \
-	&& apt-get update \
-    && apt-get install -y --no-install-recommends "postgresql-client-${PGSQL_MAJOR_VERSION}" \
-	&& rm -rf /var/lib/apt/lists/*
+    && DEBIAN_FRONTEND=noninteractive \
+        apt-get install -y --quiet --no-install-recommends \
+            apt-utils locales less curl wget vim sudo cron iputils-ping gnupg lsb-release \
+            msmtp msmtp-mta bsd-mailx mailutils \
+            tzdata \
+            sshfs \
+            python3 \
+            openssl \
+            ca-certificates \
+            fuse3 \
+            lz4 \
+            libacl1 \
+    # Add postresql deb package repo
+    && echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - \ 
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive \
+        apt-get install -y --quiet --no-install-recommends "postgresql-client-${PGSQL_MAJOR_VERSION}" \
+    && apt-get -y autoremove \
+    && apt-get clean autoclean \
+    && rm -fr /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/*
 
 # Set the locale
 RUN sed -i 's/# \(fr_FR\.UTF-8 .*\)/\1/' /etc/locale.gen \
@@ -98,6 +101,7 @@ RUN sed -i 's/^# alias/alias/' /root/.bashrc
 
 # Add Telegram send message script
 COPY ./telegram-send.sh /usr/local/bin/telegram-send
+RUN  chmod 0755 /usr/local/bin/telegram-send
 
 # Copy file from "builder" image
 #COPY --from=builder /usr/lib/python3/dist-packages /usr/lib/python3/
@@ -117,3 +121,4 @@ COPY ./docker-entrypoint.sh /entrypoint.sh
 RUN chmod 755 /entrypoint.sh
 
 CMD ["/entrypoint.sh"]
+

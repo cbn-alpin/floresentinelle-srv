@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   telegraf:
-    image: telegraf:1.24.4
+    image: telegraf:1.26.3
     container_name: telegraf
     # https://hub.docker.com/_/telegraf
     restart: unless-stopped
@@ -12,6 +12,8 @@ services:
     # To authorize telgraf to access to /run/docker.sock set host docker gid
     # Find docker gid with: stat -c '%g' /var/run/docker.sock
     user: "telegraf:${DOCKER_GID:-997}"
+    group_add:
+      - adm
     environment:
       HOSTNAME: ${HOSTNAME:-floresentinelle}
       HOST_MOUNT_PREFIX: /host
@@ -24,8 +26,7 @@ services:
       INFLUXDB2_INIT_ORG: ${INFLUXDB2_INIT_ORG}
       INFLUXDB2_INIT_BUCKET: ${INFLUXDB2_INIT_BUCKET}
       INFLUXDB2_TELEGRAF_TOKEN: ${INFLUXDB2_TELEGRAF_TOKEN}
-    networks:
-      - nginx-proxy
+      POSTGRESQL_TELEGRAF_PWD: ${POSTGRESQL_TELEGRAF_PWD}
     volumes:
       - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
       - /:/host:ro
@@ -33,5 +34,6 @@ services:
       - /opt/srvstatus/status.json:/opt/srvstatus/status.json
 
 networks:
-  nginx-proxy:
+  default:
+    name: nginx-proxy
     external: true

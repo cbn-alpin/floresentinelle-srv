@@ -1,4 +1,4 @@
-FROM wordpress:6.0.0-php8.1-fpm
+FROM wordpress:6.2.2-php8.2-fpm
 # https://hub.docker.com/_/wordpress
 
 # Install utils and sendmail

@@ -16,8 +16,6 @@ services:
     env_file:
       - .env
       - msmtp.env
-    networks:
-      - nginx-proxy
     volumes:
       - ${VOLUME_SOURCE}:/mnt/source:ro                         # backup source
       - ${VOLUME_TARGET}:/mnt/borg-repository                   # backup target
@@ -29,5 +27,6 @@ services:
       - ./config/ntfy.yml:/root/.config/ntfy/ntfy.yml:ro        # Ntfy config file
 
 networks:
-  nginx-proxy:
+  default:
+    name: nginx-proxy
     external: true

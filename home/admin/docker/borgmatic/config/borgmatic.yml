@@ -40,6 +40,7 @@ retention:
     keep_yearly: 3
     prefix: 'floresentinelle-srv-'
 
+
 consistency:
     checks:
         - repository
@@ -52,8 +53,9 @@ hooks:
        - name: geonature2db
          hostname: 172.18.5.1
          port: 5432
-         username: geonatadmin
-         password: <geonatadmin-password>
+         # WARNING: use user with superadmin right and add "trust" for 172.18.5.1 in pg_hba.conf
+         # With geonatadmin (not superuser) the dump can failed !
+         username: postgres
          # WARNING : the "directory" format doesn't work ! Use the "custom" format instead.
          format: custom
          # WARNING : the below option does'nt work with "directory" format.
