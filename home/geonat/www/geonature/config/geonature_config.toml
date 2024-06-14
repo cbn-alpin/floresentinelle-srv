@@ -26,6 +26,8 @@ DEFAULT_LANGUAGE = "fr"
 # Enable logging email error (must fill the mail config section bellow if true)
 MAIL_ON_ERROR = true
 
+# Set Sentry DSN
+SENTRY_DSN = "https://<key>@app-monitor.cbn-alpin.fr/1"
 
 #######################################################################################
 ###### Si vous souhaitez surcoucher certains paramètres,
@@ -37,12 +39,12 @@ VERSION_LOCATIONS = "/home/geonat/www/usershub/app/migrations/versions"
 
 # Configuration de l'envoie d'emails
 [MAIL_CONFIG]
-    MAIL_SERVER = "localhost"
-    MAIL_PORT = 25
-    MAIL_USE_TLS = false
+    MAIL_SERVER = "ssl0.ovh.net"
+    MAIL_PORT = 587
+    MAIL_USE_TLS = true
     MAIL_USE_SSL = false
-    MAIL_USERNAME = ""
-    MAIL_PASSWORD = ""
+    MAIL_USERNAME = "mailer@floresentinelle.fr"
+    MAIL_PASSWORD = "<mailer-passord>"
     MAIL_DEFAULT_SENDER = "Ne Pas Répondre <mailer@floresentinelle.fr>"
     MAIL_ASCII_ATTACHMENTS = false
     # email(s) to the administrator for the email logging
@@ -80,15 +82,6 @@ VERSION_LOCATIONS = "/home/geonat/www/usershub/app/migrations/versions"
 
 # Configuration cartographique
 [MAPCONFIG]
-    BASEMAP = [
-        {"name" = "OpenStreetMap", "layer" = "//{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", "attribution" = "&copy; OpenStreetMap", "maxZoom" = 22, "maxNativeZoom" = 19},
-        {"name" = "OpenTopoMap", "layer" = "//a.tile.opentopomap.org/{z}/{x}/{y}.png", "attribution" = "&copy; OpenTopoMap", "maxZoom" = 22, "maxNativeZoom" = 17},
-        {"name" = "GoogleSatellite", "layer" = "//{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", "subdomains" = ["mt0", "mt1", "mt2", "mt3"], "attribution" = "&copy; GoogleMap", "maxZoom" = 22, "maxNativeZoom" = 21},
-        {"name" = "IGN SCAN 25&reg;", "layer" = "https://wxs.ign.fr/t4sr51pyq5p40vk97r18m64e/geoportail/wmts?LAYER=GEOGRAPHICALGRIDSYSTEMS.MAPS&EXCEPTIONS=text/xml&FORMAT=image/jpeg&SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}", "attribution" = "&copy; IGN-F/Geoportail", "maxZoom" = 22, "maxNativeZoom" = 18},
-        {"name" = "IGN Ortho", "layer" = "https://wxs.ign.fr/ortho/geoportail/wmts?&REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&STYLE=normal&TILEMATRIXSET=PM&FORMAT=image/jpeg&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}", "attribution" = "&copy; IGN", "maxZoom" = 22, "maxNativeZoom" = 19},
-        {"name" = "IGN Cadastre", "layer" = "https://wxs.ign.fr/parcellaire/geoportail/wmts?&REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&STYLE=normal&TILEMATRIXSET=PM&FORMAT=image/png&LAYER=CADASTRALPARCELS.PARCELS&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}", "attribution" = "&copy; IGN", "maxZoom" = 22, "maxNativeZoom" = 19},
-        {"name" = "IGN Plan v2", "layer" = "https://wxs.ign.fr/cartes/geoportail/wmts?&REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&STYLE=normal&TILEMATRIXSET=PM&FORMAT=image/png&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}", "attribution" = "&copy; IGN", "maxZoom" = 22, "maxNativeZoom" = 19}
-    ]
     # Attention : les coordonnées sont au format [Y, X]
     # Cf leaflet configuration (https://leafletjs.com/reference-1.4.0.html#latlng-l-latlng)
     CENTER = [44.63891, 6.11608]
@@ -98,7 +91,17 @@ VERSION_LOCATIONS = "/home/geonat/www/usershub/app/migrations/versions"
     ZOOM_LEVEL_RELEVE = 15
     # Zoom appliqué sur la carte lorsque l'on clique sur une liste
     ZOOM_ON_CLICK = 16
-
+    # Configuration des fonds carto
+    BASEMAP = [
+        {"name" = "OpenStreetMap",    "layer" = "//{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", "attribution" = "&copy; OpenStreetMap", "maxZoom" = 22, "maxNativeZoom" = 19},
+        {"name" = "OpenTopoMap",      "layer" = "//a.tile.opentopomap.org/{z}/{x}/{y}.png", "attribution" = "&copy; OpenTopoMap", "maxZoom" = 22, "maxNativeZoom" = 17},
+        {"name" = "GoogleSatellite",  "layer" = "//{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", "subdomains" = ["mt0", "mt1", "mt2", "mt3"], "attribution" = "&copy; GoogleMap", "maxZoom" = 22, "maxNativeZoom" = 22},
+        {"name" = "IGN SCAN 25&reg;", "layer" = "https://wxs.ign.fr/t4sr51pyq5p40vk97r18m64e/geoportail/wmts?LAYER=GEOGRAPHICALGRIDSYSTEMS.MAPS&EXCEPTIONS=text/xml&FORMAT=image/jpeg&SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}", "attribution" = "&copy; IGN-F/Geoportail", "maxZoom" = 22, "maxNativeZoom" = 18},
+        {"name" = "IGN Ortho",        "layer" = "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&LAYER=HR.ORTHOIMAGERY.ORTHOPHOTOS&FORMAT=image/jpeg", "attribution" = "&copy; IGN", "maxZoom" = 22, "maxNativeZoom" = 19},
+        {"name" = "IGN Cadastre",     "layer" = "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&LAYER=CADASTRALPARCELS.PARCELS&FORMAT=image/png", "attribution" = "&copy; IGN", "maxZoom" = 22, "maxNativeZoom" = 19},
+        {"name" = "IGN Plan v2",      "layer" = "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&FORMAT=image/png", "attribution" = "&copy; IGN", "maxZoom" = 22, "maxNativeZoom" = 19},
+        {"name" = "BRGM Géologie", "url" = "https://geoservices.brgm.fr/WMS-C/?", "service" = "wms", "layers" = "GEOLOGIE", "attribution" = '&copy; BRGM - <a href="https://infoterre.brgm.fr/viewer/" target="_blank">BD Charm-50</a>'}
+    ]
 
 # CRITICAL: 50 ; ERROR: 40 ; WARNING: 30 ; INFO: 20 ; DEBUG: 10 ; NOTSET: 0
 [SERVER]
@@ -115,7 +118,7 @@ VERSION_LOCATIONS = "/home/geonat/www/usershub/app/migrations/versions"
     # Nombre d'observation maximum à afficher sur la carte après une recherche
     NB_MAX_OBS_MAP = 100000
     # Nombre des dernières observations affichées par défaut quand on arrive sur la synthese
-    NB_LAST_OBS = 0
+    NB_LAST_OBS = 200
     # Colonne à afficher par défaut sur la liste des résultats de la synthese
     # Choisir le champ 'prop' parmis les colonnes suivante
     # (id_synthese, date_min, cd_nom, lb_nom, nom_vern_or_lb_nom, st_asgeojson, observers, dataset_name, url_source)
@@ -132,3 +135,4 @@ VERSION_LOCATIONS = "/home/geonat/www/usershub/app/migrations/versions"
     # Nombre max d'observation dans les exports
     # WARNING : Au 2020-11-12, un bug empêche d'avoir une valeur différente pour les export.
     NB_MAX_OBS_EXPORT = 100000
+
