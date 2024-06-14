@@ -1,26 +1,23 @@
-DATEVAR="date +%Y%m%d"
+#!/usr/bin/env bash
+# Encoding : UTF-8
+# Script to backup Wordpress database and wp-content directory
 
-echo " Taskes performed on $($DATEVAR)"
+TODAY=$(date +"%Y-%m-%d")
+BKP_DIR="/backups"
 
-# Dump current database in mariadb docker
-echo " - > Dump sql database"
-mysqldump -P 3306 -h cms-mariadb -u $MYSQL_USER -p$MYSQL_PASSWORD -B $MYSQL_DB > "/var/www/html/backup/wordpress_dump_$($DATEVAR).sql"
+mariadb-dump --host cms-mariadb --port 3306 \
+    --user root --password=${MARIADB_ROOT_PASSWORD} \
+    --disable-ssl-verify-server-cert \
+    ${WORDPRESS_DB_NAME} > ${BKP_DIR}/${TODAY}_cms-wordpress.dump.sql
 
-# Archive and zip wp-content
-echo " - - > Archive & Zip wp-content"
-tar -zcf "/var/www/html/backup/wp-content_backup_$($DATEVAR).tar.gz" --absolute-names /var/www/html/wp-content
+cd /var/www/html/
+tar -jcvf "${BKP_DIR}/${TODAY}_cms-wp-content.backup.tar.bz2" ./wp-content
 
-# Delete archive older than 1 day
-echo " - - - > Delete old archive"
-find /var/www/html/backup/* -mtime +1 -exec rm {} \;
+chown -R ${HOST_USER_ID}:${HOST_GROUP_ID} "${BKP_DIR}"
 
-# Set www-data ownership for access in wordpress
-echo " - - - - > Set correct ownership"
-chown -R $BACKUP_USER /var/www/html/backup/
+find "${BKP_DIR}/" -type f -mtime +1 -regextype egrep -regex '.*\.(backup\.tar\.bz2|dump\.sql)$' -exec rm {} \;
 
-# List all files in backup directory for log
-echo " - - - - - > Files saves : "
-for filename in $(ls /var/www/html/backup/)
-	do
-		echo $filename
-	done;
+for filename in "${BKP_DIR}/*" ; do
+    echo $filename
+done;
+

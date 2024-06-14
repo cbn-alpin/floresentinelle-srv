@@ -1,4 +1,11 @@
-version: "3.9"
+#version: "3.9"
+
+x-logging:
+  &default-logging
+  driver: "json-file"
+  options:
+    max-size: 4m
+    max-file: 10
 
 services:
   borgmatic:
@@ -8,7 +15,7 @@ services:
       args:
         - MAILTO=${MAILTO}
         - PGSQL_MAJOR_VERSION=${PGSQL_MAJOR_VERSION}
-    image: cbn-alpin/borgmatic:1.0.0
+    image: cbna/borgmatic:2024.06.12
     # https://hub.docker.com/r/b3vis/borgmatic/
     container_name: borgmatic
     restart: unless-stopped
@@ -16,6 +23,9 @@ services:
     env_file:
       - .env
       - msmtp.env
+    environment:
+      TZ: ${TZ:-Europe/Paris}
+    logging: *default-logging
     volumes:
       - ${VOLUME_SOURCE}:/mnt/source:ro                         # backup source
       - ${VOLUME_TARGET}:/mnt/borg-repository                   # backup target

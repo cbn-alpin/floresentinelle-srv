@@ -5,5 +5,4 @@ set -e
 printenv | sed 's/=\(.*\)/="\1"/' > /etc/environment
 
 # Start cron IN foreground mode, don't daemonize.
-cron && tail -f /var/log/cron.log
 /usr/sbin/cron -f

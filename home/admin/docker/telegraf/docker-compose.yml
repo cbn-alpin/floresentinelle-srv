@@ -1,8 +1,23 @@
-version: "3.9"
+#version: "3.9"
+
+x-logging:
+  &default-logging
+  driver: "json-file"
+  options:
+    max-size: 4m
+    max-file: 10
 
 services:
   telegraf:
-    image: telegraf:1.26.3
+    build:
+      context: ./build/
+      dockerfile: Dockerfile
+      args:
+        TZ: ${TZ:-Europe/Paris}
+        TELEGRAF_PGCUSTOM_URL_ZIP: ${TELEGRAF_PGCUSTOM_URL_ZIP}
+        POSTGRESQL_HOST: ${POSTGRESQL_HOST}
+        POSTGRESQL_TELEGRAF_PWD: ${POSTGRESQL_TELEGRAF_PWD}
+    image: cbna/telegraf-1.29.5
     container_name: telegraf
     # https://hub.docker.com/_/telegraf
     restart: unless-stopped
@@ -19,7 +34,7 @@ services:
       HOST_MOUNT_PREFIX: /host
       HOST_ETC: /host/etc
       HOST_PROC: /host/proc
-      HOST_PROC_MOUNTINFO: /proc/1
+      HOST_PROC_MOUNTINFO: /host/proc/self/mountinfo
       HOST_RUN: /host/run
       HOST_SYS: /host/sys
       HOST_VAR: /host/var
@@ -27,10 +42,12 @@ services:
       INFLUXDB2_INIT_BUCKET: ${INFLUXDB2_INIT_BUCKET}
       INFLUXDB2_TELEGRAF_TOKEN: ${INFLUXDB2_TELEGRAF_TOKEN}
       POSTGRESQL_TELEGRAF_PWD: ${POSTGRESQL_TELEGRAF_PWD}
+    logging: *default-logging
     volumes:
       - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
       - /:/host:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /run/docker.sock:/run/docker.sock:ro
+      - /run/utmp:/host/var/run/utmp
       - /opt/srvstatus/status.json:/opt/srvstatus/status.json
 
 networks:

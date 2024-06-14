@@ -1,0 +1,2 @@
+# Ignore dump in this directory
+*.dump.sql.gz
