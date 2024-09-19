@@ -1,6 +1,6 @@
 {
     "module_label":"Végétation - Recouvrement",
-    "module_desc":"Module de suivi des végétations selon leur recouvrement",
+    "module_desc":"Module de suivi des végétations selon leur recouvrement (niveau 3)",
     "map_label_field_name": "sites_group_name",
     "export_csv": [
         {
