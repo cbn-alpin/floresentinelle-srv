@@ -20,7 +20,8 @@
     "ruderal_coverage",
     "bare_ground_coverage",
     "litter_coverage",
-    "mineral_coverage"
+    "mineral_coverage",
+    "releve_type"
   ],
   "display_list": [
     "visit_date_min",
@@ -142,6 +143,20 @@
       "min": 0,
       "max": 100,
       "value": 0
+    },
+    "releve_type": {
+      "type_widget": "radio",
+      "attribut_label": "Type de relevé",
+      "values": [
+        {
+          "value": "Présence/Absence",
+          "label": "Présence/Absence"
+        },
+        {
+          "value": "Braun-Blanquet",
+          "label": "Braun-Blanquet"
+        }
+      ]
     }
   }
 }
