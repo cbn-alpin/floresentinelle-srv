@@ -1,6 +1,6 @@
 {
   "id_field_name": "id_observation",
-  "description_field_name":"cd_nom",
+  "description_field_name": "cd_nom",
   "chained": true,
   "label": "observation",
   "label_list": "Observations",
@@ -8,13 +8,11 @@
   "redirect_to_parent": true,
   "display_properties": [
     "cd_nom",
-    "id_nomenclature_strate_vegetation",
     "coverage",
     "comments"
   ],
   "display_list": [
     "cd_nom",
-    "id_nomenclature_strate_vegetation",
     "coverage",
     "comments"
   ],
@@ -28,20 +26,44 @@
       "required": true,
       "type_util": "taxonomy"
     },
-    "id_nomenclature_strate_vegetation": {
-      "type_widget": "nomenclature",
-      "attribut_label": "Strate de végétation concernée",
-      "code_nomenclature_type": "STRATE_VEGETATION",
-      "type_util": "nomenclature",
-      "required": true
-    },
     "coverage": {
-      "type_widget": "number",
-      "attribut_label": "Recouvrement de l'espèce (%)",
-      "required": true,
-      "min": 0,
-      "max": 100,
-      "value": 0
+      "type_widget": "radio",
+      "attribut_label": "Recouvrement de l'espèce (Braun-Blanquet)",
+      "value": null,
+      "values": [
+        {
+          "value": null,
+          "label": "-"
+        },
+        {
+          "value": "r",
+          "label": "r"
+        },
+        {
+          "value": "+",
+          "label": "+"
+        },
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        },
+        {
+          "value": "3",
+          "label": "3"
+        },
+        {
+          "value": "4",
+          "label": "4"
+        },
+        {
+          "value": "5",
+          "label": "5"
+        }
+      ]
     },
     "comments": {
       "type_widget": "textarea",
