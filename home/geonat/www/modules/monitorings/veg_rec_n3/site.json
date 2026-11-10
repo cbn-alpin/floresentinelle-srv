@@ -3,7 +3,7 @@
   "id_field_name": "id_base_site",
   "description_field_name": "base_site_name",
   "label": "quadrat",
-  "label_list": "Quadrats",
+  "label_list": "Modalités - Quadrats",
   "genre": "M",
   "geom_field_name": "geom",
   "uuid_field_name": "uuid_base_site",
@@ -16,7 +16,8 @@
     "base_site_description",
     "coordinates_X",
     "coordinates_Y",
-    "surface"
+    "surface",
+    "restoration_techniques"
   ],
   "display_list": [
     "base_site_name",
@@ -70,6 +71,11 @@
     "surface": {
       "type_widget": "number",
       "attribut_label": "Surface (m2)"
+    },
+    "restoration_techniques" : {
+      "attribut_label":"Techniques de restauration",
+      "type_widget": "nomenclature",
+      "code_nomenclature_type":"TECH_RESTAURATION"
     }
   }
 }

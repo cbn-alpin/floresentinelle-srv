@@ -8,13 +8,11 @@
   "redirect_to_parent": true,
   "display_properties": [
     "cd_nom",
-    "id_nomenclature_strate_vegetation",
     "coverage",
     "comments"
   ],
   "display_list": [
     "cd_nom",
-    "id_nomenclature_strate_vegetation",
     "coverage",
     "comments"
   ],
@@ -27,13 +25,6 @@
       "application": "TaxHub",
       "required": true,
       "type_util": "taxonomy"
-    },
-    "id_nomenclature_strate_vegetation": {
-      "type_widget": "nomenclature",
-      "attribut_label": "Strate de végétation concernée",
-      "code_nomenclature_type": "STRATE_VEGETATION",
-      "type_util": "nomenclature",
-      "required": true
     },
     "coverage": {
       "type_widget": "radio",
