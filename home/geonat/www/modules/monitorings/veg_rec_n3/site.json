@@ -26,7 +26,7 @@
   "specific": {
     "id_sites_group": {
       "type_widget": "datalist",
-      "attribut_label": "Groupe de site",
+      "attribut_label": "Site",
       "type_util": "sites_group",
       "keyValue": "id_sites_group",
       "keyLabel": "sites_group_name",
